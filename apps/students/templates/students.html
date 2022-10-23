@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title> Admin </title>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+  {% csrf_token %}
+            <div class="box-header">
+              <h3 class="box-title">Students' Table</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th>Surname</th>
+                  <th>First Name</th>
+                  <th>Class</th>
+                  <th colspan="2">RFID Code</th>
+
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for student in students %}
+                <tr>
+                  <td>{{student.surname}}</td>
+                  <td>{{student.first_name}}</td>
+                  <td>{{student.classs}}</td>
+
+                  <td>
+                    <span class="btn btn-link" id="{{student.pk}}">{{student.get_rfid_code}}</span>
+
+                  </td>
+                  <td>
+                    <div class="btn-group ml-3">
+                      <button type="button" class="btn btn-warning">Edit</button>
+                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li onclick="updateCode({{student.pk}})"><a href="#">Update Code</a></li>
+                      </ul>
+                    </div>
+                  </td>
+
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                  <th>Surname</th>
+                  <th>First Name</th>
+                  <th>Class</th>
+                  <th>RFID Code</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+</script>
+
+<script>
+  $(function () {
+    $('#example1').DataTable()
+    $('#example2').DataTable({
+      'paging'      : true,
+      'lengthChange': false,
+      'searching'   : false,
+      'ordering'    : true,
+      'info'        : true,
+      'autoWidth'   : false
+    })
+  })
+</script>
+
+<script>
+  function updateCode(pk){
+    event.preventDefault()
+    connectSerial()
+    let port, textEncoder, writableStreamClosed, writer;
+
+    async function connectSerial() {
+        try {
+            // Prompt user to select any serial port.
+            port = await navigator.serial.requestPort();
+            await port.open({ baudRate: "9600" });
+            listenToPort();
+
+            textEncoder = new TextEncoderStream();
+            writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+
+            writer = textEncoder.writable.getWriter();
+        } catch (e){
+            alert(e + "Serial Connection Failed");
+        }
+    }
+    let v = "";
+    async function listenToPort() {
+        const textDecoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+        const reader = textDecoder.readable.getReader();
+
+        // Listen to data coming from the serial device.
+        while (true) {
+            let { value, done } = await reader.read();
+            if (done) {
+                // Allow the serial port to be closed later.
+                //reader.releaseLock();
+                break;
+            }
+            // value is a string.
+            var newLine = /\r\n|\r|\n/.exec(value);
+
+            if (newLine){
+                v += value;
+                v.replace(/\r\n|\n|\r|\s/g, "")
+                if (!v.replace(/\r\n|\n|\r|\s/g, "").length) {
+                  console.log("string only contains whitespace (ie. spaces, tabs or line breaks)");
+                }else {
+                    if (v.length > 3){
+                            makeRequest(v, pk)
+                        }
+                }
+                v = "";
+            }else{
+                v += value;
+            }
+        }
+    }
+
+    function makeRequest(value, pk){
+        $.ajax({
+            url: "/api/students/update-rfid-code/",
+            type: 'PATCH',
+            data: {"rfid_code": value, 'pk': pk},
+            dataType: "json",
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin',
+            success: function (response){
+                if (!response.success){
+                    Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: response.message,
+                    animation: true,
+                    showClass: {
+                        popup: 'animate__animated animate__bounceIn'
+                    },
+
+                    hideClass: {
+                        popup: 'animate__animated animate__bounceOut'
+                    }
+                })
+
+                } else if (response.success){
+                    document.getElementById(`${response.student.id}`).textContent = response.student.rfid_code
+                    Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: response.message,
+                    animation: true,
+                    showClass: {
+                        popup: 'animate__animated animate__bounceIn'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__bounceOut'
+                    }
+                })
+                } else if (response.status === 'NOT ACTIVE'){
+                    document.querySelector('#errorContainer').style.display = 'block'
+                }
+                v = ""
+            },
+        })
+    }
+  }
+</script>
+{% endblock %}
