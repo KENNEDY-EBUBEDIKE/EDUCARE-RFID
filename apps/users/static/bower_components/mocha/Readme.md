@@ -158,8 +158,8 @@
      1    Koen Punt               0.1%
      1    Laszlo Bacsi            0.1%
      1    Liam Newman             0.1%
-     1    László Bácsi         0.1%
-     1    Maciej Małecki         0.1%
+     1    László Bácsi            0.1%
+     1    Maciej Małecki          0.1%
      1    Mal Graty               0.1%
      1    Marc Kuo                0.1%
      1    Matt Robenolt           0.1%
