@@ -5,7 +5,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'vodatrox.com',
     'www.vodatrox.com',
-    'rfid.educare-rfid.vodatrox.com',
+    'educare-rfid.vodatrox.com',
     'www.educare-rfid.vodatrox.com',
 ]
 
