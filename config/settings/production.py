@@ -9,17 +9,6 @@ ALLOWED_HOSTS = [
     'www.educare-rfid.vodatrox.com',
 ]
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-# Gathers the static files here when collect static command is run
-STATIC_ROOT = '/home/vodatro1/educare-rfid.vodatrox.com/static/'
-MEDIA_ROOT = '/home/vodatro1/educare-rfid.vodatrox.com/media/'
-
-
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-
 
 CORS_ALLOWED_ORIGINS = [
     'https://vodatrox.com',
