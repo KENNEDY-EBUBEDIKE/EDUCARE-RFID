@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+#dist/
 downloads/
 eggs/
 .eggs/
@@ -59,6 +59,7 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
+.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:
@@ -104,10 +105,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
-<<<<<<< HEAD
-=======
+
 .idea
->>>>>>> 6ebbe309819ed3b3671e9e4e8446db6bc5a8e0f9
 env/
 ../venv/
 ENV/
@@ -130,12 +129,4 @@ venv.bak/
 dmypy.json
 
 # Pyre type checker
-<<<<<<< HEAD
 .pyre/
-=======
-<<<<<<< HEAD
-.pyre/
-=======
-.pyre/
->>>>>>> 8ad6842 (initial commit)
->>>>>>> 6ebbe309819ed3b3671e9e4e8446db6bc5a8e0f9
